@@ -7,17 +7,18 @@ const logFormat = printf(({ level, message, timestamp, stack }) => {
   return `${timestamp} [${level}]: ${stack || message}`;
 });
 
-// Create logger
 const log = createLogger({
   level: process.env.LOG_LEVEL || "info",
+
+  // ✅ Keep base format minimal
   format: combine(
-    timestamp({ format: "YYYY-MM-DD HH:mm:ss" }),
-    errors({ stack: true }), // logs stack trace
-    json(),
+    errors({ stack: true }), // only stack handling here
   ),
+
   transports: [
-    // Console transport (dev-friendly)
+    // ✅ Console (human readable)
     new transports.Console({
+      level: "debug", // 👈 important fix
       format: combine(
         colorize(),
         timestamp({ format: "YYYY-MM-DD HH:mm:ss" }),
@@ -25,15 +26,17 @@ const log = createLogger({
       ),
     }),
 
-    // File transport for errors
+    // ✅ Error file (JSON)
     new transports.File({
       filename: "logs/error.log",
       level: "error",
+      format: combine(timestamp(), errors({ stack: true }), json()),
     }),
 
-    // File transport for all logs
+    // ✅ Combined file (JSON)
     new transports.File({
       filename: "logs/combined.log",
+      format: combine(timestamp(), errors({ stack: true }), json()),
     }),
   ],
 
@@ -42,5 +45,4 @@ const log = createLogger({
   rejectionHandlers: [new transports.File({ filename: "logs/rejections.log" })],
 });
 
-// Export logger
 export default log;
