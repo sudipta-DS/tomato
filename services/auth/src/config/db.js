@@ -1,9 +1,8 @@
 import mongoose from "mongoose";
 import log from "../utils/logger.js";
-
 const connectDB = async () => {
   try {
-    await mongoose.connect(process.env.MONGO_URI as string, {
+    await mongoose.connect(process.env.MONGO_URI, {
       dbName: "Zomato_Clone",
     });
     log.info("MONGODB connected successfully.");
@@ -11,5 +10,4 @@ const connectDB = async () => {
     log.error(error);
   }
 };
-
 export default connectDB;
